@@ -9,7 +9,13 @@ import {
   Search, 
   Sparkles,
   ArrowRight,
-  Filter
+  Filter,
+  Code2,
+  Copy,
+  Check,
+  ExternalLink,
+  X,
+  FileJson
 } from 'lucide-react';
 import { STATES_DATA, StateInfo } from '../data/mmjData';
 import { getStateById } from '../utils/routeContentStore';
@@ -43,6 +49,8 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
   const [activeTab, setActiveTab] = useState<'all' | 'state-legal' | 'general'>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [openIndex, setOpenIndex] = useState<number | null>(0); // First item open by default
+  const [showSchemaModal, setShowSchemaModal] = useState<boolean>(false);
+  const [copiedSchema, setCopiedSchema] = useState<boolean>(false);
 
   // Synchronize internal state when the stateId prop changes
   useEffect(() => {
@@ -224,7 +232,7 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
     return list;
   }, [activeState, stateDossier]);
 
-  // Combined and filtered questions
+  // Combined and filtered questions for UI display
   const displayedQuestions = useMemo(() => {
     let combined: FAQItem[] = [];
 
@@ -247,12 +255,86 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
     );
   }, [activeTab, stateLegalQuestions, generalQuestions, searchQuery]);
 
+  // Complete list of all questions and answers associated with this state context for JSON-LD schema
+  const allQuestionsForSchema: FAQItem[] = useMemo(() => {
+    return [...stateLegalQuestions, ...generalQuestions];
+  }, [stateLegalQuestions, generalQuestions]);
+
+  // Generate official Schema.org FAQPage JSON-LD schema object
+  const faqSchema = useMemo(() => {
+    const pageUrl = typeof window !== 'undefined' 
+      ? window.location.origin + `/medical-marijuana-card-${activeState.id.toLowerCase()}/`
+      : `https://onlinemmjcard.com/medical-marijuana-card-${activeState.id.toLowerCase()}/`;
+
+    return {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "@id": `${pageUrl}#faq`,
+      "name": `${activeState.name} Medical Marijuana Card & Telehealth Evaluation FAQs`,
+      "description": `Frequently asked questions and legal answers for ${activeState.name} medical cannabis patients regarding telemedicine laws, statutory possession limits, qualifying conditions, and state certification procedures.`,
+      "url": pageUrl,
+      "inLanguage": "en-US",
+      "mainEntity": allQuestionsForSchema.map((item) => ({
+        "@type": "Question",
+        "name": item.q,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": item.a
+        }
+      }))
+    };
+  }, [activeState, allQuestionsForSchema]);
+
+  // Automatically inject and update JSON-LD FAQ schema into document.head
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+
+    const SCRIPT_ID = 'faq-section-jsonld-schema';
+    let scriptTag = document.getElementById(SCRIPT_ID) as HTMLScriptElement | null;
+    
+    if (!scriptTag) {
+      scriptTag = document.createElement('script');
+      scriptTag.id = SCRIPT_ID;
+      scriptTag.type = 'application/ld+json';
+      document.head.appendChild(scriptTag);
+    }
+
+    // Safely serialize with escaped closing script tags
+    const serialized = JSON.stringify(faqSchema, null, 2).replace(/<\/script>/gi, '<\\/script>');
+    scriptTag.textContent = serialized;
+
+    return () => {
+      // Clean up dynamic schema element on unmount
+      const el = document.getElementById(SCRIPT_ID);
+      if (el) {
+        el.remove();
+      }
+    };
+  }, [faqSchema]);
+
   const toggle = (idx: number) => {
     setOpenIndex(openIndex === idx ? null : idx);
   };
 
+  const handleCopySchema = () => {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(JSON.stringify(faqSchema, null, 2));
+      setCopiedSchema(true);
+      setTimeout(() => setCopiedSchema(false), 2500);
+    }
+  };
+
   return (
-    <section id="faqs" className="py-20 bg-slate-50/70 border-b border-slate-200">
+    <section id="faqs" className="py-20 bg-slate-50/70 border-b border-slate-200 relative">
+      {/* Inline Schema.org FAQPage Structured Data for Crawlers & Headless Renderers */}
+      <script
+        id={`faq-inline-schema-${activeState.id}`}
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(faqSchema).replace(/<\/script>/gi, '<\\/script>')
+        }}
+      />
+
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
@@ -351,6 +433,29 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
               }`}
             >
               General Telehealth FAQs ({generalQuestions.length})
+            </button>
+          </div>
+
+          {/* SEO Structured Data Schema Bar */}
+          <div className="flex items-center justify-between text-xs text-slate-500 pt-3 border-t border-slate-100 flex-wrap gap-2">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold text-[11px]">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a] animate-pulse"></span>
+                <span>JSON-LD FAQ Schema Injected ({allQuestionsForSchema.length} Q&As)</span>
+              </span>
+              <span className="hidden sm:inline text-slate-500 text-[11px]">
+                Targeted for <strong>{activeState.name}</strong> Google Rich Results & AI Overviews
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowSchemaModal(true)}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer border border-slate-200"
+              title="Inspect dynamically injected Schema.org FAQPage structured data"
+            >
+              <Code2 className="w-3.5 h-3.5 text-[#16a34a]" />
+              <span>Inspect Schema.org JSON-LD</span>
             </button>
           </div>
 
@@ -456,6 +561,108 @@ export const FAQSection: React.FC<FAQSectionProps> = ({
         </div>
 
       </div>
+
+      {/* JSON-LD Schema Inspector Modal */}
+      {showSchemaModal && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-150"
+          onClick={() => setShowSchemaModal(false)}
+        >
+          <div 
+            className="bg-white rounded-3xl max-w-3xl w-full max-h-[85vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-[#22c55e] flex items-center justify-center border border-emerald-500/30">
+                  <FileJson className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-extrabold text-white flex items-center gap-2">
+                    Schema.org JSON-LD FAQPage Structured Data
+                    <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-[10px] font-black uppercase border border-emerald-500/30">
+                      Live Dynamic
+                    </span>
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    Automatically generated and injected for {activeState.name} ({activeState.code}) • {allQuestionsForSchema.length} Question/Answer entities
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setShowSchemaModal(false)}
+                className="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+                aria-label="Close modal"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Modal Subheader & Actions */}
+            <div className="px-6 py-3 bg-slate-100 border-b border-slate-200 flex items-center justify-between flex-wrap gap-2 text-xs">
+              <div className="flex items-center gap-2 text-slate-600">
+                <span className="font-semibold text-slate-900">Script ID:</span>
+                <code className="bg-white px-2 py-0.5 rounded border border-slate-300 text-[11px] font-mono text-emerald-700">
+                  faq-section-jsonld-schema
+                </code>
+                <span className="text-slate-400">• Injected in &lt;head&gt; &amp; &lt;body&gt;</span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleCopySchema}
+                  className="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 font-bold text-xs transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+                >
+                  {copiedSchema ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-[#16a34a]" />
+                      <span className="text-[#16a34a]">Copied to Clipboard!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5 text-slate-500" />
+                      <span>Copy JSON-LD</span>
+                    </>
+                  )}
+                </button>
+
+                <a
+                  href="https://search.google.com/test/rich-results"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-colors flex items-center gap-1.5 shadow-xs"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Google Rich Results Test</span>
+                </a>
+              </div>
+            </div>
+
+            {/* Code Body */}
+            <div className="flex-1 overflow-auto p-6 bg-slate-950 text-slate-200">
+              <pre className="text-xs font-mono leading-relaxed whitespace-pre font-normal text-emerald-400/90 select-all">
+                {JSON.stringify(faqSchema, null, 2)}
+              </pre>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-3 bg-white border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
+              <div>
+                Valid Schema.org <code>FAQPage</code> syntax adhering to Google Search Central guidelines.
+              </div>
+              <button
+                onClick={() => setShowSchemaModal(false)}
+                className="px-4 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold transition-colors cursor-pointer"
+              >
+                Close Inspector
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </section>
   );
 };
