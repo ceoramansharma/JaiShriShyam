@@ -257,6 +257,7 @@ export interface SectionToggles {
   doctors: boolean;
   whyTrust: boolean;
   reviews: boolean;
+  patientStories: boolean;
   seoContent: boolean;
   faq: boolean;
 }
@@ -276,6 +277,7 @@ export const DEFAULT_SECTION_TOGGLES: SectionToggles = {
   doctors: true,
   whyTrust: true,
   reviews: true,
+  patientStories: true,
   seoContent: true,
   faq: true,
 };

@@ -1788,6 +1788,7 @@ export const ThemeVisualBuilder: React.FC<ThemeVisualBuilderProps> = ({
                 { key: 'doctors' as keyof SectionToggles, label: '12. Medical Advisory Team', desc: 'Licensed MD bios, medical specialties, and state licenses' },
                 { key: 'whyTrust' as keyof SectionToggles, label: '13. Why Patients Trust Us', desc: 'Compassionate medical care philosophy and mission' },
                 { key: 'reviews' as keyof SectionToggles, label: '14. Verified Patient Reviews', desc: '14,250+ reviews with 4.9/5 star average rating' },
+                { key: 'patientStories' as keyof SectionToggles, label: '14b. Patient Stories Carousel', desc: 'Rotating verified patient testimonials with headshots and star ratings' },
                 { key: 'seoContent' as keyof SectionToggles, label: '15. SEO Topical Authority', desc: 'In-depth medical marijuana guide with accordion tabs' },
                 { key: 'faq' as keyof SectionToggles, label: '16. Frequently Asked Questions', desc: 'Common patient questions with expand/collapse answers' },
               ].map((sec) => {

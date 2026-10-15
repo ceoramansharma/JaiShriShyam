@@ -17,6 +17,7 @@ import { ReciprocityCheckerSection } from './components/ReciprocityCheckerSectio
 import { PricingPlansSection } from './components/PricingPlansSection';
 import { DoctorDirectorySection } from './components/DoctorDirectorySection';
 import { ReviewsSection } from './components/ReviewsSection';
+import { PatientStoriesSection } from './components/PatientStoriesSection';
 import { SEOContentSection } from './components/SEOContentSection';
 import { FAQSection } from './components/FAQSection';
 import { Footer } from './components/Footer';
@@ -564,13 +565,22 @@ export default function App({ isHeadlessMode = false }: AppProps) {
             {/* Verified Patient Reviews */}
             {safeToggles.reviews && <ReviewsSection />}
 
+            {/* Rotating Patient Stories & Testimonials */}
+            {safeToggles.patientStories && (
+              <PatientStoriesSection 
+                onOpenApply={handleOpenApply}
+                onNavigateState={handleNavigateState}
+              />
+            )}
+
             {/* SEO Topical Authority & Complete Patient Guide */}
             {safeToggles.seoContent && <SEOContentSection onOpenApply={handleOpenApply} />}
 
-            {/* Frequently Asked Questions */}
+            {/* Frequently Asked Questions with Dynamic Location-Specific Legal FAQs */}
             {safeToggles.faq && (
               <FAQSection 
-                onOpenApply={() => handleOpenApply()} 
+                stateId={selectedStateId}
+                onOpenApply={handleOpenApply} 
                 onOpenContact={() => setIsContactModalOpen(true)} 
               />
             )}
@@ -773,7 +783,9 @@ export default function App({ isHeadlessMode = false }: AppProps) {
               onOpenApply={() => handleOpenApply()} 
               onNavigateCondition={handleNavigateCondition}
             />
-            <FAQSection onOpenApply={() => handleOpenApply()} />
+            <ReviewsSection />
+            <PatientStoriesSection onOpenApply={handleOpenApply} onNavigateState={handleNavigateState} />
+            <FAQSection stateId={selectedStateId} onOpenApply={handleOpenApply} />
           </>
         )}
       </main>

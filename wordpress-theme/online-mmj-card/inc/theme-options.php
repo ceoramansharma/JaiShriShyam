@@ -32,6 +32,7 @@ function online_mmj_get_default_section_toggles() {
         'doctors'        => true,
         'whyTrust'       => true,
         'reviews'        => true,
+        'patientStories' => true,
         'seoContent'     => true,
         'faq'            => true,
     );
