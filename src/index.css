@@ -4,49 +4,95 @@
   html {
     font-family: 'Open Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     scroll-behavior: smooth;
-    /* Prevent horizontal layout shifts when vertical scrollbar appears */
-    scrollbar-gutter: stable;
     min-height: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    scrollbar-gutter: auto !important;
   }
 
   body {
     min-height: 100%;
-    margin: 0;
-    padding: 0;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Reserve full viewport container height to eliminate vertical CLS (Cumulative Layout Shift) */
+  body.online-mmj-spa-active {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    overflow-x: hidden;
+  }
+
+  /* -------------------------------------------------------------------------
+   * Root Container & Top-Level Container Reset
+   * Explicitly reset margin, padding, and width to zero for top-level container,
+   * removing forced constraints causing white space at the top, left, and right.
+   * ------------------------------------------------------------------------- */
   #root,
-  #online-mmj-card-root {
+  #online-mmj-card-root,
+  #root > div,
+  #online-mmj-card-root > div,
+  .online-mmj-spa-loaded {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    outline: 0 !important;
+    inset: 0 !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 0;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
     min-height: 100vh;
     min-height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
+    display: flex !important;
+    flex-direction: column !important;
     position: relative;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 
-  /* Exact header height reservation to prevent header bounce during hydration */
+  /* Header natural height without forced height constraints that cause whitespace at the top */
   .online-mmj-header,
   .online-mmj-static-header,
-  #online-mmj-card-root header {
-    min-height: 112px;
+  #online-mmj-card-root header,
+  #root header {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-top: 0 !important;
+    min-height: auto;
   }
 
-  /* Prevent duplicate static WordPress PHP header, banner, progress bar, or footer when React SPA is mounted */
-  body.online-mmj-spa-active > .online-mmj-static-progress,
-  body.online-mmj-spa-active > .online-mmj-static-banner,
-  body.online-mmj-spa-active > .online-mmj-static-header,
-  body.online-mmj-spa-active > .online-mmj-static-footer,
-  body.online-mmj-spa-active > .mmj-breadcrumbs,
-  body.online-mmj-spa-active > header.online-mmj-header,
-  body.online-mmj-spa-active > header.site-header,
-  body.online-mmj-spa-active > footer.site-footer,
+  /* Prevent duplicate static WordPress PHP header, banner, progress bar, breadcrumbs, or footer when React SPA is mounted */
+  body.online-mmj-spa-active .online-mmj-static-progress,
+  body.online-mmj-spa-active .online-mmj-static-banner,
+  body.online-mmj-spa-active .online-mmj-static-header,
+  body.online-mmj-spa-active .online-mmj-static-footer,
+  body.online-mmj-spa-active .mmj-breadcrumbs,
+  body.online-mmj-spa-active header.online-mmj-header:not(#online-mmj-card-root *),
+  body.online-mmj-spa-active header.site-header:not(#online-mmj-card-root *),
+  body.online-mmj-spa-active footer.site-footer:not(#online-mmj-card-root *),
+  body.online-mmj-spa-active footer.online-mmj-static-footer:not(#online-mmj-card-root *),
   body.online-mmj-spa-active #mmj-scroll-progress,
   body.online-mmj-spa-active .mmj-static-fallback,
-  body.online-mmj-spa-active .mmj-static-prerender {
+  body.online-mmj-spa-active .mmj-static-prerender,
+  body.online-mmj-spa-active > div.bg-slate-50:not(#online-mmj-card-root) {
     display: none !important;
   }
 
@@ -57,23 +103,12 @@
      page body right after React mounted. */
   body.online-mmj-spa-active main:not(#online-mmj-card-root *) > *:not(#online-mmj-card-root):not(:has(#online-mmj-card-root)),
   body.online-mmj-spa-active article:not(#online-mmj-card-root *) > *:not(#online-mmj-card-root):not(:has(#online-mmj-card-root)),
-  body.online-mmj-spa-active .entry-content:not(#online-mmj-card-root *) > *:not(#online-mmj-card-root):not(:has(#online-mmj-card-root)) {
+  body.online-mmj-spa-active .entry-content:not(#online-mmj-card-root *) > *:not(#online-mmj-card-root):not(:has(#online-mmj-card-root)),
+  body.online-mmj-spa-active .mmj-container:not(#online-mmj-card-root *) > *:not(#online-mmj-card-root):not(:has(#online-mmj-card-root)) {
     display: none !important;
   }
 
   /* Explicit guarantee: All elements inside the React SPA root container are always visible and never hidden */
-  #online-mmj-card-root,
-  #root {
-    min-height: 100vh;
-    min-height: 100dvh;
-    display: flex !important;
-    flex-direction: column !important;
-    width: 100%;
-    position: relative;
-    visibility: visible !important;
-    opacity: 1 !important;
-  }
-
   #online-mmj-card-root main,
   #root main {
     display: flex !important;
@@ -81,6 +116,10 @@
     flex: 1 1 0% !important;
     visibility: visible !important;
     opacity: 1 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
   #online-mmj-card-root main > *,
@@ -90,27 +129,40 @@
   }
 
   /* Zero out padding and constraints when mounting React inside WordPress template containers */
-  body.online-mmj-spa-active > main,
-  body.online-mmj-spa-active > #main-content {
+  body.online-mmj-spa-active main,
+  body.online-mmj-spa-active #main-content,
+  body.online-mmj-spa-active .site-main,
+  body.online-mmj-spa-active article,
+  body.online-mmj-spa-active .entry-page,
+  body.online-mmj-spa-active .entry-content,
+  body.online-mmj-spa-active .mmj-container,
+  body.online-mmj-spa-active .site,
+  body.online-mmj-spa-active #page,
+  body.online-mmj-spa-active .site-content {
     padding: 0 !important;
     margin: 0 !important;
     max-width: 100% !important;
     width: 100% !important;
     border: none !important;
+    box-shadow: none !important;
     background: transparent !important;
   }
 
-  /* WordPress Admin Bar Compatibility */
-  body.admin-bar header.sticky,
-  .admin-bar header.sticky,
-  .admin-bar #online-mmj-card-root header {
+  /* WordPress Admin Bar Compatibility: ensure sticky header stays flush when admin bar is active */
+  body.admin-bar #online-mmj-card-root header.sticky,
+  body.admin-bar header.online-mmj-header.sticky {
     top: 32px !important;
   }
   @media screen and (max-width: 782px) {
-    body.admin-bar header.sticky,
-    .admin-bar header.sticky,
-    .admin-bar #online-mmj-card-root header {
+    body.admin-bar #online-mmj-card-root header.sticky,
+    body.admin-bar header.online-mmj-header.sticky {
       top: 46px !important;
+    }
+  }
+  @media screen and (max-width: 600px) {
+    body.admin-bar #online-mmj-card-root header.sticky,
+    body.admin-bar header.online-mmj-header.sticky {
+      top: 0 !important;
     }
   }
 

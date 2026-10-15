@@ -429,7 +429,7 @@ function online_mmj_card_enqueue_assets() {
         'online-mmj-card-base-style',
         get_stylesheet_uri(),
         array(),
-        '2.1.1'
+        '2.1.2'
     );
 
     // 3. Scan the theme's assets directory for compiled CSS & JS bundles
@@ -450,7 +450,7 @@ function online_mmj_card_enqueue_assets() {
                         'online-mmj-card-compiled-css',
                         $assets_url . $file,
                         array('online-mmj-card-base-style'),
-                        '2.1.1'
+                        '2.1.2'
                     );
                     $css_enqueued = true;
                 }
@@ -461,7 +461,7 @@ function online_mmj_card_enqueue_assets() {
                         'online-mmj-card-compiled-js',
                         $assets_url . $file,
                         array(),
-                        '2.1.1',
+                        '2.1.2',
                         true
                     );
                     $js_enqueued = true;

@@ -11,7 +11,8 @@
 get_header();
 ?>
 
-<main id="main-content" class="site-main py-10 sm:py-14 min-h-[60vh]">
+<div id="online-mmj-card-root" class="w-full">
+  <main id="main-content" class="site-main py-10 sm:py-14 min-h-[60vh] mmj-static-fallback">
   <div class="mmj-container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
     <?php
     while (have_posts()) :
@@ -80,14 +81,13 @@ get_header();
         endif;
         ?>
 
-        <!-- Telehealth SPA Interactive Mount -->
-        <div id="online-mmj-card-root" class="mt-8"></div>
       </article>
       <?php
     endwhile;
     ?>
   </div>
 </main>
+</div>
 
 <?php
 get_footer();

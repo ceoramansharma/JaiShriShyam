@@ -11,7 +11,8 @@
 get_header();
 ?>
 
-<main id="main-content" class="site-main py-10 sm:py-14 min-h-[60vh]">
+<div id="online-mmj-card-root" class="w-full">
+  <main id="main-content" class="site-main py-10 sm:py-14 min-h-[60vh] mmj-static-fallback">
   <div class="mmj-container max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
     
     <header class="page-header mb-10 pb-4 border-b border-slate-200">
@@ -92,11 +93,9 @@ get_header();
       </div>
     <?php endif; ?>
 
-    <!-- Interactive Telehealth Mount for Full Responsive React SPA -->
-    <div id="online-mmj-card-root" class="mt-8"></div>
-
   </div>
 </main>
+</div>
 
 <?php
 get_footer();
