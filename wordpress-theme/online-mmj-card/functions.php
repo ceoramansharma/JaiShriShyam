@@ -429,7 +429,7 @@ function online_mmj_card_enqueue_assets() {
         'online-mmj-card-base-style',
         get_stylesheet_uri(),
         array(),
-        '2.1.0'
+        '2.1.1'
     );
 
     // 3. Scan the theme's assets directory for compiled CSS & JS bundles
@@ -439,12 +439,8 @@ function online_mmj_card_enqueue_assets() {
     if (is_dir($assets_dir)) {
         $files = scandir($assets_dir);
         if ($files) {
-            // Sort by file modification time descending so the latest built bundle is always enqueued
-            usort($files, function($a, $b) use ($assets_dir) {
-                $time_a = file_exists($assets_dir . $a) ? filemtime($assets_dir . $a) : 0;
-                $time_b = file_exists($assets_dir . $b) ? filemtime($assets_dir . $b) : 0;
-                return $time_b - $time_a;
-            });
+            // Sort in reverse so latest hashes are chosen if multiple exist
+            rsort($files);
             $css_enqueued = false;
             $js_enqueued  = false;
             foreach ($files as $file) {
@@ -454,7 +450,7 @@ function online_mmj_card_enqueue_assets() {
                         'online-mmj-card-compiled-css',
                         $assets_url . $file,
                         array('online-mmj-card-base-style'),
-                        '2.1.0'
+                        '2.1.1'
                     );
                     $css_enqueued = true;
                 }
@@ -465,7 +461,7 @@ function online_mmj_card_enqueue_assets() {
                         'online-mmj-card-compiled-js',
                         $assets_url . $file,
                         array(),
-                        '2.1.0',
+                        '2.1.1',
                         true
                     );
                     $js_enqueued = true;
@@ -1258,4 +1254,3 @@ if (!function_exists('online_mmj_render_error_logs_page')) {
 if (file_exists(get_template_directory() . '/debug_theme.php')) {
     require_once get_template_directory() . '/debug_theme.php';
 }
-

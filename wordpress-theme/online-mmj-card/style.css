@@ -206,58 +206,36 @@ a:hover {
   width: 100%;
 }
 
-/* Prevent duplicate static WordPress PHP header, banner, progress bar, or footer when React SPA is mounted */
+/* Prevent duplicate static WordPress PHP header, banner, progress bar, breadcrumbs, or footer when React SPA is mounted */
 body.online-mmj-spa-active > .online-mmj-static-progress,
 body.online-mmj-spa-active > .online-mmj-static-banner,
 body.online-mmj-spa-active > .online-mmj-static-header,
 body.online-mmj-spa-active > .online-mmj-static-footer,
 body.online-mmj-spa-active > .mmj-breadcrumbs,
+body.online-mmj-spa-active .mmj-breadcrumbs,
 body.online-mmj-spa-active > header.site-header,
 body.online-mmj-spa-active > header.online-mmj-header,
 body.online-mmj-spa-active > footer.site-footer,
 body.online-mmj-spa-active #mmj-scroll-progress,
-body.online-mmj-spa-active .mmj-static-fallback,
-body.online-mmj-spa-active .mmj-static-prerender {
+body.online-mmj-spa-active > div.bg-slate-50:not(#online-mmj-card-root) {
   display: none !important;
 }
 
-/* Explicit guarantee: All elements inside the React SPA root container are always visible and never hidden */
-#online-mmj-card-root {
-  min-height: 100vh;
-  min-height: 100dvh;
-  display: flex !important;
-  flex-direction: column !important;
-  width: 100%;
-  position: relative;
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-
-#online-mmj-card-root main {
-  display: flex !important;
-  flex-direction: column !important;
-  flex: 1 1 0% !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-
-#online-mmj-card-root main > * {
-  visibility: visible !important;
-  opacity: 1 !important;
+/* Hide any static sibling elements around #online-mmj-card-root inside WordPress templates.
+   IMPORTANT: these selectors must NEVER match elements rendered by React itself (everything
+   inside #online-mmj-card-root). React renders its own <main>/<article> whose children are the
+   page sections; without the ":not(#online-mmj-card-root *)" guard this rule hid the entire
+   page body right after React mounted (body flashed, then only header + footer remained). */
+body.online-mmj-spa-active main:not(#online-mmj-card-root *) > *:not(#online-mmj-card-root):not(:has(#online-mmj-card-root)),
+body.online-mmj-spa-active article:not(#online-mmj-card-root *) > *:not(#online-mmj-card-root):not(:has(#online-mmj-card-root)),
+body.online-mmj-spa-active .entry-content:not(#online-mmj-card-root *) > *:not(#online-mmj-card-root):not(:has(#online-mmj-card-root)) {
+  display: none !important;
 }
 
 /* Zero out padding and constraints when mounting React inside WordPress template containers */
-body.online-mmj-spa-active > main,
-body.online-mmj-spa-active > #main-content {
-  padding: 0 !important;
-  margin: 0 !important;
-  max-width: 100% !important;
-  width: 100% !important;
-  border: none !important;
-  background: transparent !important;
-}
-body.online-mmj-spa-active article:has(#online-mmj-card-root),
-body.online-mmj-spa-active .entry-content:has(#online-mmj-card-root) {
+body.online-mmj-spa-active main,
+body.online-mmj-spa-active article,
+body.online-mmj-spa-active .entry-content {
   padding: 0 !important;
   margin: 0 !important;
   max-width: 100% !important;
@@ -570,4 +548,3 @@ body.admin-bar header.sticky,
 .has-warning-amber-background-color { background-color: #d97706 !important; }
 .has-white-color { color: #ffffff !important; }
 .has-white-background-color { background-color: #ffffff !important; }
-

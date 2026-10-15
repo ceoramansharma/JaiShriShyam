@@ -50,6 +50,17 @@
     display: none !important;
   }
 
+  /* Hide any static sibling elements around #online-mmj-card-root inside WordPress templates.
+     IMPORTANT: these selectors must NEVER match elements rendered by React itself (everything
+     inside #online-mmj-card-root). React renders its own <main>/<article> whose children are the
+     page sections; without the ":not(#online-mmj-card-root *)" guard this rule hid the entire
+     page body right after React mounted. */
+  body.online-mmj-spa-active main:not(#online-mmj-card-root *) > *:not(#online-mmj-card-root):not(:has(#online-mmj-card-root)),
+  body.online-mmj-spa-active article:not(#online-mmj-card-root *) > *:not(#online-mmj-card-root):not(:has(#online-mmj-card-root)),
+  body.online-mmj-spa-active .entry-content:not(#online-mmj-card-root *) > *:not(#online-mmj-card-root):not(:has(#online-mmj-card-root)) {
+    display: none !important;
+  }
+
   /* Explicit guarantee: All elements inside the React SPA root container are always visible and never hidden */
   #online-mmj-card-root,
   #root {
